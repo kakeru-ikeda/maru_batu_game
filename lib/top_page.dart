@@ -25,7 +25,7 @@ class TopPage extends StatelessWidget {
                   foregroundColor: Colors.black,
                   backgroundColor: Colors.blue,
                 ),
-                child: const Text('ゲームをプレイする'),
+                child: const Text('ゲームをプレイする!'),
               ),
               const Text('戦績'),
             ]),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:test002/main.dart';
 
 class GamePage extends StatefulWidget {
@@ -12,16 +13,74 @@ class _GamePageState extends State<GamePage> {
   bool _turn = true;
   bool _gameStop = false;
   String _winner = '';
+  List<String> winners = [];
 
-  // ignore: prefer_final_fields
-  List<List<String>> _imagePathList = [
+  List<List<String>> imagePathList = [
     ['blank', 'blank', 'blank'],
     ['blank', 'blank', 'blank'],
     ['blank', 'blank', 'blank'],
   ];
-  void _playerWin(bool turn) {
+  void _playerWin({required bool turn}) {
     _winner = 'player${turn ? 1 : 2}の勝利！';
     _gameStop = true;
+  }
+
+  void _winCheck(int i, int j) {
+    if (imagePathList[i][j] == 'blank' && _gameStop == false) {
+      imagePathList[i][j] = _turn ? 'maru' : 'batu';
+      if (imagePathList[0][0] == imagePathList[1][1] &&
+          imagePathList[0][0] == imagePathList[2][2] &&
+          imagePathList[0][0] != 'blank') {
+        _playerWin(turn: _turn);
+        return;
+      } else if (imagePathList[0][2] == imagePathList[1][1] &&
+          imagePathList[0][2] == imagePathList[2][0] &&
+          imagePathList[0][2] != 'blank') {
+        _playerWin(turn: _turn);
+        return;
+      }
+
+      for (int k = 0; k < 3; k++) {
+        if (imagePathList[k][0] == imagePathList[k][1] &&
+            imagePathList[k][0] == imagePathList[k][2] &&
+            imagePathList[k][0] != 'blank') {
+          _playerWin(turn: _turn);
+          return;
+        } else if (imagePathList[0][k] == imagePathList[1][k] &&
+            imagePathList[0][k] == imagePathList[2][k] &&
+            imagePathList[0][k] != 'blank') {
+          _playerWin(turn: _turn);
+          return;
+        }
+      }
+      for (int l = 0; l < imagePathList.length; l++) {
+        if (imagePathList[l].contains('blank')) {
+          _turn = !_turn;
+          return;
+        }
+      }
+      _gameStop = true;
+      _winner = '引き分け！';
+    }
+
+    winners.add(_winner);
+    _saveResult();
+  }
+
+  void _saveResult() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setStringList('result', winners);
+  }
+
+  void _reset() {
+    for (int i = 0; i < 3; i++) {
+      for (int j = 0; j < 3; j++) {
+        imagePathList[i][j] = 'blank';
+        _turn = true;
+        _gameStop = false;
+        _winner = '';
+      }
+    }
   }
 
   @override
@@ -46,58 +105,11 @@ class _GamePageState extends State<GamePage> {
                           child: GestureDetector(
                             onTap: () {
                               setState(() {
-                                if (_imagePathList[i][j] == 'blank' &&
-                                    _gameStop == false) {
-                                  _imagePathList[i][j] =
-                                      _turn ? 'maru' : 'batu';
-                                  if (_imagePathList[0][0] ==
-                                          _imagePathList[1][1] &&
-                                      _imagePathList[0][0] ==
-                                          _imagePathList[2][2] &&
-                                      _imagePathList[0][0] != 'blank') {
-                                    _playerWin(_turn);
-                                    return;
-                                  } else if (_imagePathList[0][2] ==
-                                          _imagePathList[1][1] &&
-                                      _imagePathList[0][2] ==
-                                          _imagePathList[2][0] &&
-                                      _imagePathList[0][2] != 'blank') {
-                                    _playerWin(_turn);
-                                    return;
-                                  }
-
-                                  for (int k = 0; k < 3; k++) {
-                                    if (_imagePathList[k][0] ==
-                                            _imagePathList[k][1] &&
-                                        _imagePathList[k][0] ==
-                                            _imagePathList[k][2] &&
-                                        _imagePathList[k][0] != 'blank') {
-                                      _playerWin(_turn);
-                                      return;
-                                    } else if (_imagePathList[0][k] ==
-                                            _imagePathList[1][k] &&
-                                        _imagePathList[0][k] ==
-                                            _imagePathList[2][k] &&
-                                        _imagePathList[0][k] != 'blank') {
-                                      _playerWin(_turn);
-                                      return;
-                                    }
-                                  }
-                                  for (int l = 0;
-                                      l < _imagePathList.length;
-                                      l++) {
-                                    if (_imagePathList[l].contains('blank')) {
-                                      _turn = !_turn;
-                                      return;
-                                    }
-                                  }
-                                  _gameStop = true;
-                                  _winner = '引き分け！';
-                                }
+                                _winCheck(i, j);
                               });
                             },
                             child: Image.asset(
-                                'assets/image/${_imagePathList[i][j]}.png'),
+                                'assets/image/${imagePathList[i][j]}.png'),
                           ),
                         ),
                       },
@@ -140,14 +152,7 @@ class _GamePageState extends State<GamePage> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           setState(() {
-            for (int i = 0; i < 3; i++) {
-              for (int j = 0; j < 3; j++) {
-                _imagePathList[i][j] = 'blank';
-                _turn = true;
-                _gameStop = false;
-                _winner = '';
-              }
-            }
+            _reset();
           });
         },
         tooltip: 'リセット',

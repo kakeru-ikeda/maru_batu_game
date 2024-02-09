@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:test002/main.dart';
 
@@ -62,8 +63,10 @@ class _GamePageState extends State<GamePage> {
       _gameStop = true;
       _winner = '引き分け！';
     }
-
-    winners.add(_winner);
+    DateTime now = DateTime.now();
+    DateFormat dateFormater = DateFormat('yyyy-MM-dd hh:mm:ss');
+    String date = dateFormater.format(now.toUtc());
+    winners.add(date + _winner);
     _saveResult();
   }
 

@@ -97,30 +97,26 @@ class _GamePageState extends State<GamePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Column(
-              children: <Widget>[
-                for (int i = 0; i < 3; i++) ...{
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      for (int j = 0; j < 3; j++) ...{
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                _winCheck(i, j);
-                              });
-                            },
-                            child: Image.asset(
-                                'assets/image/${imagePathList[i][j]}.png'),
-                          ),
-                        ),
-                      },
-                    ],
-                  ),
-                },
-              ],
-            ),
+            for (int i = 0; i < 3; i++) ...{
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  for (int j = 0; j < 3; j++) ...{
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _winCheck(i, j);
+                          });
+                        },
+                        child: Image.asset(
+                            'assets/image/${imagePathList[i][j]}.png'),
+                      ),
+                    ),
+                  },
+                ],
+              ),
+            },
             Text(
               'player${_turn ? 1 : 2}のターン',
               style: const TextStyle(

@@ -3,6 +3,7 @@ import 'package:test002/game_page.dart';
 
 // ignore: use_key_in_widget_constructors
 class TopPage extends StatelessWidget {
+  // List<String> battleRecord = [];
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -1,9 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:test002/game_page.dart';
 
 // ignore: use_key_in_widget_constructors
-class TopPage extends StatelessWidget {
-  // List<String> battleRecord = [];
+class TopPage extends StatefulWidget {
+  @override
+  State<TopPage> createState() => _TopPageState();
+}
+
+class _TopPageState extends State<TopPage> {
+  List<String> battleRecord = [];
+
+  void getResult() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    battleRecord = prefs.getStringList('result') ?? [];
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getResult();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,6 +47,9 @@ class TopPage extends StatelessWidget {
                 child: const Text('ゲームをプレイする!'),
               ),
               const Text('戦績'),
+              for (int i = 0; i < battleRecord.length; i++) ...{
+                Text(battleRecord[i]),
+              }
             ]),
       ),
     );

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:test002/main.dart';
+import 'package:test002/top_page.dart';
 
 class GamePage extends StatefulWidget {
   const GamePage({super.key});
@@ -135,7 +135,7 @@ class _GamePageState extends State<GamePage> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const MyApp()),
+                    MaterialPageRoute(builder: (context) => TopPage()),
                   );
                 },
                 style: ElevatedButton.styleFrom(

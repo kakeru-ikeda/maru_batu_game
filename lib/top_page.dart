@@ -11,9 +11,10 @@ class TopPage extends StatefulWidget {
 class _TopPageState extends State<TopPage> {
   List<String> battleRecord = [];
 
-  void getResult() async {
+  Future<List<String>> getResult() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     battleRecord = prefs.getStringList('result') ?? [];
+    return battleRecord;
   }
 
   @override
@@ -47,9 +48,14 @@ class _TopPageState extends State<TopPage> {
                 child: const Text('ゲームをプレイする!'),
               ),
               const Text('戦績'),
+              // FutureBuilder<List<String>>(
+              //   future: getResult(),
+              //   builder: (BuildContext context,
+              //       AsyncSnapshot<List<String>> snapshot) {},
+              // ),
               for (int i = 0; i < battleRecord.length; i++) ...{
                 Text(battleRecord[i]),
-              }
+              },
             ]),
       ),
     );

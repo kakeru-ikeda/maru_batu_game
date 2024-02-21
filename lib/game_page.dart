@@ -14,7 +14,6 @@ class _GamePageState extends State<GamePage> {
   bool _turn = true;
   bool _gameStop = false;
   String _winner = '';
-  List<String> winners = [];
 
   List<List<String>> imagePathList = [
     ['blank', 'blank', 'blank'],
@@ -24,6 +23,7 @@ class _GamePageState extends State<GamePage> {
   void _playerWin({required bool turn}) {
     _winner = 'player${turn ? 1 : 2}の勝利！';
     _gameStop = true;
+    _saveResult();
   }
 
   void _winCheck(int i, int j) {
@@ -62,16 +62,17 @@ class _GamePageState extends State<GamePage> {
       }
       _gameStop = true;
       _winner = '引き分け！';
+      _saveResult();
     }
-    DateTime now = DateTime.now();
-    DateFormat dateFormater = DateFormat('yyyy-MM-dd hh:mm:ss');
-    String date = dateFormater.format(now.toUtc());
-    winners.add(date + _winner);
-    _saveResult();
   }
 
   void _saveResult() async {
+    DateTime now = DateTime.now();
+    DateFormat dateFormater = DateFormat('yyyy-MM-dd hh:mm:ss');
+    String date = dateFormater.format(now.toUtc());
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> winners = prefs.getStringList('result') ?? [];
+    winners.add(date + _winner);
     prefs.setStringList('result', winners);
   }
 

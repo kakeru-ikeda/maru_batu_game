@@ -9,11 +9,11 @@ class TopPage extends StatefulWidget {
 }
 
 class _TopPageState extends State<TopPage> {
-  List<String> battleRecord = [];
+  late List<String>? battleRecord;
 
-  Future<List<String>> getResult() async {
+  Future<List<String>?> getResult() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    battleRecord = prefs.getStringList('result') ?? [];
+    battleRecord = prefs.getStringList('result');
     return battleRecord;
   }
 
@@ -48,14 +48,24 @@ class _TopPageState extends State<TopPage> {
                 child: const Text('ゲームをプレイする!'),
               ),
               const Text('戦績'),
-              // FutureBuilder<List<String>>(
-              //   future: getResult(),
-              //   builder: (BuildContext context,
-              //       AsyncSnapshot<List<String>> snapshot) {},
-              // ),
-              for (int i = 0; i < battleRecord.length; i++) ...{
-                Text(battleRecord[i]),
-              },
+              FutureBuilder<List<String>?>(
+                future: getResult(),
+                builder: (BuildContext context,
+                    AsyncSnapshot<List<String>?> snapshot) {
+                  if (snapshot.hasData) {
+                    List<String>? data = snapshot.data;
+                    return Column(
+                      children: <Widget>[
+                        for (int i = 0; i < data!.length; i++) ...{
+                          Text(data[i]),
+                        }
+                      ],
+                    );
+                  } else {
+                    return const Text("データなし");
+                  }
+                },
+              ),
             ]),
       ),
     );

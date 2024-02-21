@@ -9,18 +9,10 @@ class TopPage extends StatefulWidget {
 }
 
 class _TopPageState extends State<TopPage> {
-  late List<String>? battleRecord;
-
   Future<List<String>?> getResult() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    battleRecord = prefs.getStringList('result');
+    List<String>? battleRecord = prefs.getStringList('result');
     return battleRecord;
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    getResult();
   }
 
   @override
@@ -32,47 +24,53 @@ class _TopPageState extends State<TopPage> {
       ),
       body: Center(
         child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => const GamePage()),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.black,
-                  backgroundColor: Colors.blue,
-                ),
-                child: const Text(
-                  'ゲームをプレイする!',
-                  style: TextStyle(fontSize: 20),
-                ),
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const GamePage()),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.black,
+                backgroundColor: Colors.blue,
               ),
-              const Text(
-                '戦績',
+              child: const Text(
+                'ゲームをプレイする!',
                 style: TextStyle(fontSize: 20),
               ),
-              FutureBuilder<List<String>?>(
-                future: getResult(),
-                builder: (BuildContext context,
-                    AsyncSnapshot<List<String>?> snapshot) {
-                  if (snapshot.hasData) {
-                    List<String>? data = snapshot.data;
-                    return Column(
-                      children: <Widget>[
-                        for (int i = 0; i < data!.length; i++) ...{
-                          Text(data[i]),
-                        }
-                      ],
-                    );
-                  } else {
-                    return const Text("データなし");
-                  }
-                },
-              ),
-            ]),
+            ),
+            const Text(
+              '戦績',
+              style: TextStyle(fontSize: 20),
+            ),
+            FutureBuilder<List<String>?>(
+              future: getResult(),
+              builder: (BuildContext context,
+                  AsyncSnapshot<List<String>?> snapshot) {
+                /// 通信中の場合はローディングを表示
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const CircularProgressIndicator();
+                }
+
+                if (snapshot.hasData) {
+                  List<String>? data = snapshot.data;
+                  return Column(
+                    children: <Widget>[
+                      for (int i = 0; i < data!.length; i++) ...{
+                        Text(data[i]),
+                      }
+                    ],
+                  );
+                } else {
+                  return const Text("データなし");
+                }
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -134,7 +134,7 @@ class _GamePageState extends State<GamePage> {
               visible: _gameStop,
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.push(
+                  Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(builder: (context) => TopPage()),
                   );

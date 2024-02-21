@@ -36,7 +36,7 @@ class _TopPageState extends State<TopPage> {
             children: <Widget>[
               ElevatedButton(
                 onPressed: () {
-                  Navigator.push(
+                  Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(builder: (context) => const GamePage()),
                   );
@@ -45,9 +45,15 @@ class _TopPageState extends State<TopPage> {
                   foregroundColor: Colors.black,
                   backgroundColor: Colors.blue,
                 ),
-                child: const Text('ゲームをプレイする!'),
+                child: const Text(
+                  'ゲームをプレイする!',
+                  style: TextStyle(fontSize: 20),
+                ),
               ),
-              const Text('戦績'),
+              const Text(
+                '戦績',
+                style: TextStyle(fontSize: 20),
+              ),
               FutureBuilder<List<String>?>(
                 future: getResult(),
                 builder: (BuildContext context,

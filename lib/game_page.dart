@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:test002/game_model.dart';
 import 'package:test002/top_page.dart';
 
 class GamePage extends StatefulWidget {
@@ -11,27 +12,8 @@ class GamePage extends StatefulWidget {
 }
 
 class _GamePageState extends State<GamePage> {
-  bool _turn = true;
-  bool _gameStop = false;
-  String _winner = '';
-
-  List<List<String>> imagePathList = [
-    ['blank', 'blank', 'blank'],
-    ['blank', 'blank', 'blank'],
-    ['blank', 'blank', 'blank'],
-  ];
-
-  void _playerWin({required bool turn}) {
-    _winner = 'player${turn ? 1 : 2}の勝利！';
-    _gameStop = true;
-    _saveResult();
-  }
-
-  void _draw() {
-    _winner = '引き分け';
-    _gameStop = true;
-    _saveResult();
-  }
+  /// 1ゲームの情報を保持するインスタンス
+  Game game = Game(turn: true, isStop: false, winner: '');
 
   void _saveResult() async {
     DateTime now = DateTime.now();
@@ -40,7 +22,7 @@ class _GamePageState extends State<GamePage> {
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String> winners = prefs.getStringList('result') ?? [];
-    winners.add(date + _winner);
+    winners.add(date + game.winner);
     prefs.setStringList('result', winners);
   }
 
@@ -49,63 +31,62 @@ class _GamePageState extends State<GamePage> {
     bool? winner;
 
     /// 既にマスが埋まっている場合またはゲームが終了している場合は処理を行わない
-    if (imagePathList[i][j] != 'blank' || _gameStop) {
+    if (game.imagePathList[i][j] != 'blank' || game.isStop) {
       return;
     }
 
     /// タップされたマスに〇か✕の画像を表示する
-    imagePathList[i][j] = _turn ? 'maru' : 'batu';
+    game.imagePathList[i][j] = game.turn ? 'maru' : 'batu';
 
     /// 斜めの判定
-    if ((imagePathList[0][0] == imagePathList[1][1] &&
-            imagePathList[0][0] == imagePathList[2][2] &&
-            imagePathList[0][0] != 'blank') ||
-        (imagePathList[0][2] == imagePathList[1][1] &&
-            imagePathList[0][2] == imagePathList[2][0] &&
-            imagePathList[0][2] != 'blank')) {
-      winner = _turn;
+    if ((game.imagePathList[0][0] == game.imagePathList[1][1] &&
+            game.imagePathList[0][0] == game.imagePathList[2][2] &&
+            game.imagePathList[0][0] != 'blank') ||
+        (game.imagePathList[0][2] == game.imagePathList[1][1] &&
+            game.imagePathList[0][2] == game.imagePathList[2][0] &&
+            game.imagePathList[0][2] != 'blank')) {
+      winner = game.turn;
     }
 
     /// 横と縦の判定
     for (int k = 0; k < 3; k++) {
-      if ((imagePathList[k][0] == imagePathList[k][1] &&
-              imagePathList[k][0] == imagePathList[k][2] &&
-              imagePathList[k][0] != 'blank') ||
-          (imagePathList[0][k] == imagePathList[1][k] &&
-              imagePathList[0][k] == imagePathList[2][k] &&
-              imagePathList[0][k] != 'blank')) {
-        winner = _turn;
+      if ((game.imagePathList[k][0] == game.imagePathList[k][1] &&
+              game.imagePathList[k][0] == game.imagePathList[k][2] &&
+              game.imagePathList[k][0] != 'blank') ||
+          (game.imagePathList[0][k] == game.imagePathList[1][k] &&
+              game.imagePathList[0][k] == game.imagePathList[2][k] &&
+              game.imagePathList[0][k] != 'blank')) {
+        winner = game.turn;
       }
     }
 
     /// 勝利判定
     if (winner != null) {
       /// 勝利したプレイヤーを表示
-      _playerWin(turn: winner);
+      game.playerWin(turn: winner);
     } else {
       /// 引き分け判定
-      for (int l = 0; l < imagePathList.length; l++) {
-        if (imagePathList[l].contains('blank')) {
+      for (int l = 0; l < game.imagePathList.length; l++) {
+        if (game.imagePathList[l].contains('blank')) {
           /// まだ埋まっていないマスがある場合はプレイヤーターンを切り替えて処理を終了
-          _turn = !_turn;
+          game.turn = !game.turn;
           return;
         }
       }
 
       /// 全てのマスが埋まっている場合は引き分けとする
-      _draw();
+      game.draw();
+    }
+
+    /// ゲームが終了した場合は戦績を保存
+    if (game.isStop) {
+      _saveResult();
     }
   }
 
   void _reset() {
-    for (int i = 0; i < 3; i++) {
-      for (int j = 0; j < 3; j++) {
-        imagePathList[i][j] = 'blank';
-        _turn = true;
-        _gameStop = false;
-        _winner = '';
-      }
-    }
+    /// インスタンスを再生成してゲームをリセット
+    game = Game(turn: true, isStop: false, winner: '');
   }
 
   @override
@@ -132,7 +113,7 @@ class _GamePageState extends State<GamePage> {
                           });
                         },
                         child: Image.asset(
-                            'assets/image/${imagePathList[i][j]}.png'),
+                            'assets/image/${game.imagePathList[i][j]}.png'),
                       ),
                     ),
                   },
@@ -140,19 +121,19 @@ class _GamePageState extends State<GamePage> {
               ),
             },
             Text(
-              'player${_turn ? 1 : 2}のターン',
+              'player${game.turn ? 1 : 2}のターン',
               style: const TextStyle(
                 fontSize: 25,
               ),
             ),
             Text(
-              _gameStop ? _winner : '',
+              game.isStop ? game.winner : '',
               style: const TextStyle(
                 fontSize: 25,
               ),
             ),
             Visibility(
-              visible: _gameStop,
+              visible: game.isStop,
               child: ElevatedButton(
                 onPressed: () {
                   Navigator.pushReplacement(

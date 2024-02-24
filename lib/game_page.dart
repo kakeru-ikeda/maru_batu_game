@@ -13,7 +13,7 @@ class GamePage extends StatefulWidget {
 
 class _GamePageState extends State<GamePage> {
   /// 1ゲームの情報を保持するインスタンス
-  Game game = Game(turn: true, isStop: false, winner: '');
+  Game game = Game();
 
   void _saveResult() async {
     DateTime now = DateTime.now();
@@ -68,8 +68,8 @@ class _GamePageState extends State<GamePage> {
       /// 引き分け判定
       for (int l = 0; l < game.imagePathList.length; l++) {
         if (game.imagePathList[l].contains('blank')) {
-          /// まだ埋まっていないマスがある場合はプレイヤーターンを切り替えて処理を終了
-          game.turn = !game.turn;
+          /// blankマスがまだある場合はプレイヤーターンを切り替えて処理を終了
+          game.toggleTurn({turn: turn});
           return;
         }
       }
@@ -86,7 +86,7 @@ class _GamePageState extends State<GamePage> {
 
   void _reset() {
     /// インスタンスを再生成してゲームをリセット
-    game = Game(turn: true, isStop: false, winner: '');
+    game = Game();
   }
 
   @override

@@ -8,7 +8,7 @@ class Game {
     ['blank', 'blank', 'blank']
   ];
 
-  void toggleTurn({required bool turn}) {
+  void toggleTurn() {
     turn = !turn;
   }
 

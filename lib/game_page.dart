@@ -69,7 +69,7 @@ class _GamePageState extends State<GamePage> {
       for (int l = 0; l < game.imagePathList.length; l++) {
         if (game.imagePathList[l].contains('blank')) {
           /// blankマスがまだある場合はプレイヤーターンを切り替えて処理を終了
-          game.toggleTurn({turn: turn});
+          game.toggleTurn();
           return;
         }
       }

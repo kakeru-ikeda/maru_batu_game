@@ -27,38 +27,16 @@ class _GamePageState extends State<GamePage> {
   }
 
   void _winCheck(int i, int j) {
-    /// 勝利ユーザー判定用変数
-    bool? winner;
-
     /// 既にマスが埋まっている場合またはゲームが終了している場合は処理を行わない
     if (game.imagePathList[i][j] != 'blank' || game.isStop) {
       return;
     }
 
     /// タップされたマスに〇か✕の画像を表示する
-    game.imagePathList[i][j] = game.turn ? 'maru' : 'batu';
+    game.setImage(i, j);
 
-    /// 斜めの判定
-    if ((game.imagePathList[0][0] == game.imagePathList[1][1] &&
-            game.imagePathList[0][0] == game.imagePathList[2][2] &&
-            game.imagePathList[0][0] != 'blank') ||
-        (game.imagePathList[0][2] == game.imagePathList[1][1] &&
-            game.imagePathList[0][2] == game.imagePathList[2][0] &&
-            game.imagePathList[0][2] != 'blank')) {
-      winner = game.turn;
-    }
-
-    /// 横と縦の判定
-    for (int k = 0; k < 3; k++) {
-      if ((game.imagePathList[k][0] == game.imagePathList[k][1] &&
-              game.imagePathList[k][0] == game.imagePathList[k][2] &&
-              game.imagePathList[k][0] != 'blank') ||
-          (game.imagePathList[0][k] == game.imagePathList[1][k] &&
-              game.imagePathList[0][k] == game.imagePathList[2][k] &&
-              game.imagePathList[0][k] != 'blank')) {
-        winner = game.turn;
-      }
-    }
+    /// 判定処理
+    bool? winner = game.judgeWinner();
 
     /// 勝利判定
     if (winner != null) {

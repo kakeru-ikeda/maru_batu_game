@@ -13,7 +13,18 @@ class GamePage extends StatefulWidget {
 
 class _GamePageState extends State<GamePage> {
   /// 1ゲームの情報を保持するインスタンス
-  Game game = Game();
+  late Game game;
+
+  @override
+  void initState() {
+    super.initState();
+    game = Game();
+  }
+
+  void _reset() {
+    /// インスタンスを再生成してゲームをリセット
+    game = Game();
+  }
 
   void _saveResult() async {
     DateTime now = DateTime.now();
@@ -60,11 +71,6 @@ class _GamePageState extends State<GamePage> {
     if (game.isStop) {
       _saveResult();
     }
-  }
-
-  void _reset() {
-    /// インスタンスを再生成してゲームをリセット
-    game = Game();
   }
 
   @override

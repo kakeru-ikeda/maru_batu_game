@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:test002/game_model.dart';
+import 'package:test002/shared_preferences_service.dart';
 import 'package:test002/top_page.dart';
 
 class GamePage extends StatefulWidget {
@@ -14,6 +14,9 @@ class GamePage extends StatefulWidget {
 class _GamePageState extends State<GamePage> {
   /// 1ゲームの情報を保持するインスタンス
   late Game game;
+
+  /// SharedPreferencesのインスタンス
+  final SharedPreferencesService prefs = SharedPreferencesService.instance;
 
   @override
   void initState() {
@@ -31,10 +34,9 @@ class _GamePageState extends State<GamePage> {
     DateFormat dateFormater = DateFormat('yyyy-MM-dd hh:mm:ss');
     String date = dateFormater.format(now.toUtc());
 
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    List<String> winners = prefs.getStringList('result') ?? [];
+    List<String> winners = await prefs.getStringList('result') ?? [];
     winners.add(date + game.winner);
-    prefs.setStringList('result', winners);
+    await prefs.setStringList('result', winners);
   }
 
   void _winCheck(int i, int j) {

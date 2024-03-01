@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:test002/game_page.dart';
+import 'package:test002/shared_preferences_service.dart';
 
 // ignore: use_key_in_widget_constructors
 class TopPage extends StatefulWidget {
@@ -9,9 +9,11 @@ class TopPage extends StatefulWidget {
 }
 
 class _TopPageState extends State<TopPage> {
+  /// SharedPreferencesのインスタンス
+  final SharedPreferencesService prefs = SharedPreferencesService.instance;
+
   Future<List<String>?> getResult() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    List<String>? battleRecord = prefs.getStringList('result');
+    List<String>? battleRecord = await prefs.getStringList('result');
     return battleRecord;
   }
 
